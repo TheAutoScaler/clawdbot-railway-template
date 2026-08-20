@@ -1,5 +1,11 @@
 # OpenClaw Railway Template (1‑click deploy)
 
+> This fork is maintained for a single private Railway deployment. It uses an
+> official OpenClaw release image pinned by digest, runs the wrapper as a
+> non-root user, installs wrapper dependencies from the committed lockfile,
+> and accepts upgrades only through reviewed commits. Do not deploy directly
+> from the upstream template branch.
+
 This repo packages **OpenClaw** for Railway with a small **/setup** web wizard so users can deploy and onboard **without running any commands**.
 
 ## What you get
