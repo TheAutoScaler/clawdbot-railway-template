@@ -5,6 +5,14 @@ const NODE_GID = 1000;
 const STATE_DIR = process.env.OPENCLAW_STATE_DIR?.trim() || "/data/.openclaw";
 const WORKSPACE_DIR = process.env.OPENCLAW_WORKSPACE_DIR?.trim() || "/data/workspace";
 
+// The Railway image starts this bootstrap as root. Dropping the uid/gid does
+// not update identity-related environment variables, and OpenClaw uses HOME
+// to discover provider credentials and legacy state. Keep those paths within
+// the unprivileged node account instead of leaving them pointed at /root.
+process.env.HOME = "/home/node";
+process.env.USER = "node";
+process.env.LOGNAME = "node";
+
 if (process.getuid?.() === 0) {
   // Railway overlays /data at runtime, so image-time ownership does not carry
   // through. Create only the required directories and hand them to node.
