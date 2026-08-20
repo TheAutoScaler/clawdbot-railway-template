@@ -1456,6 +1456,29 @@ const server = app.listen(PORT, "0.0.0.0", async () => {
     }
   }
 
+  // Railway terminates HTTPS in front of this loopback gateway. OpenClaw
+  // rejects browser WebSocket connections unless that exact public origin is
+  // allowlisted, so derive the single generated Railway origin at runtime.
+  const railwayPublicDomain = process.env.RAILWAY_PUBLIC_DOMAIN?.trim();
+  if (isConfigured() && railwayPublicDomain) {
+    const railwayOrigin = `https://${railwayPublicDomain}`;
+    console.log(`[wrapper] allowing Control UI origin: ${railwayOrigin}`);
+    try {
+      await runCmd(
+        OPENCLAW_NODE,
+        clawArgs([
+          "config",
+          "set",
+          "--json",
+          "gateway.controlUi.allowedOrigins",
+          JSON.stringify([railwayOrigin]),
+        ]),
+      );
+    } catch (err) {
+      console.warn(`[wrapper] failed to set Control UI origin: ${String(err)}`);
+    }
+  }
+
   // Auto-start the gateway if already configured so polling channels (Telegram/Discord/etc.)
   // work even if nobody visits the web UI.
   if (isConfigured()) {
