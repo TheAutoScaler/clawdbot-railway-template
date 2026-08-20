@@ -29,7 +29,9 @@ ENV NODE_ENV=production \
 
 EXPOSE 8080
 
-# Preserve the official image's non-root security boundary and tini init.
-USER node
+# Railway volumes are mounted root-owned. The bootstrap performs the minimal
+# ownership fix required for /data, then permanently drops to the node user
+# before importing the wrapper server.
+USER root
 ENTRYPOINT ["tini", "-s", "--"]
-CMD ["node", "/wrapper/src/server.js"]
+CMD ["node", "/wrapper/src/bootstrap.js"]
