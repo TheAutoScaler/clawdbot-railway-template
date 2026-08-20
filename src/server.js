@@ -387,7 +387,7 @@ app.get("/setup", requireSetupAuth, (_req, res) => {
     <div id="status">Loading...</div>
     <div id="statusDetails" class="muted" style="margin-top:0.5rem"></div>
     <div style="margin-top: 0.75rem">
-      <a href="/openclaw" target="_blank">Open OpenClaw UI</a>
+      <a href="/setup/open-ui" target="_blank" rel="noopener">Open OpenClaw UI</a>
       &nbsp;|&nbsp;
       <a href="/setup/export" target="_blank">Download backup (.tar.gz)</a>
     </div>
@@ -589,6 +589,15 @@ app.get("/setup/api/status", requireSetupAuth, async (_req, res) => {
     channelsAddHelp: channelsHelp.output,
     authGroups: AUTH_GROUPS,
   });
+});
+
+// OpenClaw authenticates the Control UI inside its WebSocket connect payload,
+// not from the HTTP Authorization header added by this reverse proxy. Bootstrap
+// the current browser tab using OpenClaw's supported URL fragment flow. The
+// fragment is never sent in the HTTP request and the Control UI removes it
+// after copying the token into sessionStorage.
+app.get("/setup/open-ui", requireSetupAuth, (_req, res) => {
+  res.redirect(`/openclaw#token=${encodeURIComponent(OPENCLAW_GATEWAY_TOKEN)}`);
 });
 
 app.get("/setup/api/auth-groups", requireSetupAuth, (_req, res) => {
